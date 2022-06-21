@@ -6,11 +6,12 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
-using FuelMonitor.Models;
+using FuelMonitor.BO.DAO;
+using FuelMonitor.BO.Models;
 using System;
 using System.Globalization;
 
-namespace FuelMonitor
+namespace FuelMonitor.Activities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
@@ -23,7 +24,7 @@ namespace FuelMonitor
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
+            var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
             var button = FindViewById(Resource.Id.saveButton);
@@ -31,17 +32,6 @@ namespace FuelMonitor
 
             ClearInputs();
             LoadEntries();
-        }
-
-        private void SaveButton_Click(object sender, EventArgs e)
-        {
-            var dataStored = SaveFuelEntry();
-
-            if (dataStored)
-            {
-                ClearInputs();
-                LoadEntries();
-            }
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -112,11 +102,11 @@ namespace FuelMonitor
                 if (_editingId > 0)
                 {
                     entry.ID = _editingId;
-                    AppUtil.Connection.Update(entry);
+                    FuelFillDAO.Update(entry);
                 }
                 else
                 {
-                    AppUtil.Connection.Insert(entry);
+                    FuelFillDAO.Create(entry);
                 }
                 AppUtil.Connection.Commit();
 
@@ -153,17 +143,7 @@ namespace FuelMonitor
 
         private void LoadEntries()
         {
-            var rows = AppUtil.Connection.Query<FuelFillView>(@"
-                        select 
-                            *,
-                            odovalue - lastodovalue as distancetraveled,
-                            round((odovalue - lastodovalue) / fuelfilled, 2) as avgkmpl
-                        from 
-                            (select 
-                                *, 
-                                (lag(ODOValue, 1) over (order by date, _id)) as lastodovalue 
-                            from fuelfills 
-                            order by date desc, _id desc)x");
+            var rows = FuelFillDAO.GetAllView();
 
             var layout = FindViewById<TableLayout>(Resource.Id.entriesListTable);
             layout.RemoveAllViews();
@@ -179,7 +159,6 @@ namespace FuelMonitor
 
             var th = GetTableRow(editButtonCol, headerDateTextView, headerFuelFilledTextView, headerFuelCostTextView, headerODOTextView, distanceTraveledTextView, avgTraveledTextView);
             layout.AddView(th);
-
 
             foreach (var row in rows)
             {
@@ -198,6 +177,35 @@ namespace FuelMonitor
 
             var ftr = GetColumnTextView($"Total Entries: {rows.Count}", TextAlignment.TextStart);
             layout.AddView(ftr);
+        }
+
+        private void EditButton_Click(object sender, EventArgs e)
+        {
+            ClearInputs();
+            _editingId = Convert.ToInt64(((View)sender).ContentDescription);
+
+            var row = FuelFillDAO.Get(_editingId);
+
+            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
+            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
+            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
+            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
+
+            dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
+            odoValueInputText.Text = row.ODOValue.ToString("#");
+            fuelFilledText.Text = row.FuelFilled.ToString("#.00");
+            fuelCostText.Text = row.FuelCost.ToString("#.00");
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            var dataStored = SaveFuelEntry();
+
+            if (dataStored)
+            {
+                ClearInputs();
+                LoadEntries();
+            }
         }
 
         private TextView GetColumnTextView(string text, TextAlignment textAlignment = TextAlignment.TextStart)
@@ -226,27 +234,9 @@ namespace FuelMonitor
             button.SetBackgroundColor(Color.WhiteSmoke);
             button.SetMaxWidth(5);
             button.SetImageResource(Android.Resource.Drawable.IcMenuEdit);
-            button.Click += editButton_Click;
+            button.Click += EditButton_Click;
             button.SetPadding(5, 5, 5, 5);
             return button;
-        }
-
-        private void editButton_Click(object sender, EventArgs e)
-        {
-            ClearInputs();
-            _editingId = Convert.ToInt64(((View)sender).ContentDescription);
-
-            var row = AppUtil.Connection.Get<FuelFill>(_editingId);
-
-            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
-            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
-            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
-            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
-
-            dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
-            odoValueInputText.Text = row.ODOValue.ToString("#");
-            fuelFilledText.Text = row.FuelFilled.ToString("#.00");
-            fuelCostText.Text = row.FuelCost.ToString("#.00");
         }
 
         private TableRow GetTableRow(params View[] views)

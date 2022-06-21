@@ -1,4 +1,4 @@
-﻿using FuelMonitor.Models;
+﻿using FuelMonitor.BO.Models;
 using SQLite;
 using System;
 using System.IO;

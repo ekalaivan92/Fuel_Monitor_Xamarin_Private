@@ -64,8 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppUtil.cs" />
-    <Compile Include="MainActivity.cs" />
-    <Compile Include="Models\FuelFill.cs" />
+    <Compile Include="Activities\MainActivity.cs" />
+    <Compile Include="BO\DAO\FuelFillDAO.cs" />
+    <Compile Include="BO\Models\FuelFill.cs" />
+    <Compile Include="BO\Views\FuelFillView.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -118,6 +120,7 @@
     <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
     Other similar extension points exist, see Microsoft.Common.targets.

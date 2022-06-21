@@ -1,7 +1,8 @@
-﻿using SQLite;
+﻿using FuelMonitor.BO.Models;
+using SQLite;
 using System;
 
-namespace FuelMonitor.Models
+namespace FuelMonitor.BO.Models
 {
     [Table("fuelfills")]
     public class FuelFill
@@ -12,11 +13,5 @@ namespace FuelMonitor.Models
         public long ODOValue { get; set; }
         public decimal FuelFilled { get; set; }
         public decimal FuelCost { get; set; }
-    }
-
-    public class FuelFillView : FuelFill
-    {
-        public decimal DistanceTraveled { get; set; }
-        public decimal AVGKMPL { get; set; }
     }
 }
