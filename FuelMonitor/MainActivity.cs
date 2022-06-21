@@ -15,6 +15,8 @@ namespace FuelMonitor
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
+        private long _editingId;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -68,6 +70,7 @@ namespace FuelMonitor
 
         private void ClearInputs()
         {
+            _editingId = 0;
             var dateInput = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
             var odoValueInput = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
             var fuelFilled = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
@@ -105,7 +108,16 @@ namespace FuelMonitor
                 };
 
                 AppUtil.Connection.BeginTransaction();
-                AppUtil.Connection.Insert(entry);
+
+                if (_editingId > 0)
+                {
+                    entry.ID = _editingId;
+                    AppUtil.Connection.Update(entry);
+                }
+                else
+                {
+                    AppUtil.Connection.Insert(entry);
+                }
                 AppUtil.Connection.Commit();
 
                 return true;
@@ -163,8 +175,9 @@ namespace FuelMonitor
             var headerODOTextView = GetColumnTextView("ODO", TextAlignment.Center);
             var distanceTraveledTextView = GetColumnTextView("Dist. Traveled", TextAlignment.TextEnd);
             var avgTraveledTextView = GetColumnTextView("Avg KM/L", TextAlignment.TextEnd);
+            var editButtonCol = GetColumnTextView("Edit", TextAlignment.TextStart);
 
-            var th = GetTableRow(headerDateTextView, headerFuelFilledTextView, headerFuelCostTextView, headerODOTextView, distanceTraveledTextView, avgTraveledTextView);
+            var th = GetTableRow(editButtonCol, headerDateTextView, headerFuelFilledTextView, headerFuelCostTextView, headerODOTextView, distanceTraveledTextView, avgTraveledTextView);
             layout.AddView(th);
 
 
@@ -173,18 +186,18 @@ namespace FuelMonitor
                 var dateTextView = GetColumnTextView(row.Date.ToString("dd-MM-yyyy"));
                 var fuelFilledTextView = GetColumnTextView(row.FuelFilled.ToString("#.00"), TextAlignment.TextEnd);
                 var fuelCostTextView = GetColumnTextView(row.FuelCost.ToString("#.00"), TextAlignment.TextEnd);
-                var odoTextView = GetColumnTextView(row.ODOValue.ToString("#.00"), TextAlignment.TextEnd);
+                var odoTextView = GetColumnTextView(row.ODOValue.ToString("#"), TextAlignment.TextEnd);
                 var distanceTextView = GetColumnTextView(row.DistanceTraveled.ToString("#"), TextAlignment.TextEnd);
                 var avgTextView = GetColumnTextView(row.AVGKMPL.ToString("#"), TextAlignment.TextEnd);
+                var editButton = GetColumnButtonView(row.ID.ToString(), "E", TextAlignment.TextEnd);
 
-                var tr = GetTableRow(dateTextView, fuelFilledTextView, fuelCostTextView, odoTextView, distanceTextView, avgTextView);
+                var tr = GetTableRow(editButton, dateTextView, fuelFilledTextView, fuelCostTextView, odoTextView, distanceTextView, avgTextView);
 
                 layout.AddView(tr);
             }
 
             var ftr = GetColumnTextView($"Total Entries: {rows.Count}", TextAlignment.TextStart);
             layout.AddView(ftr);
-
         }
 
         private TextView GetColumnTextView(string text, TextAlignment textAlignment = TextAlignment.TextStart)
@@ -200,7 +213,43 @@ namespace FuelMonitor
             return textView;
         }
 
-        private TableRow GetTableRow(params TextView[] views)
+        private ImageButton GetColumnButtonView(string val, string text, TextAlignment textAlignment = TextAlignment.TextStart)
+        {
+            var button = new ImageButton(ApplicationContext)
+            {
+                LayoutParameters = new TableRow.LayoutParams(TableRow.LayoutParams.WrapContent, TableRow.LayoutParams.WrapContent),
+                ContentDescription = val,
+                TextAlignment = textAlignment,
+            };
+
+            button.SetAdjustViewBounds(true);
+            button.SetBackgroundColor(Color.WhiteSmoke);
+            button.SetMaxWidth(5);
+            button.SetImageResource(Android.Resource.Drawable.IcMenuEdit);
+            button.Click += editButton_Click;
+            button.SetPadding(5, 5, 5, 5);
+            return button;
+        }
+
+        private void editButton_Click(object sender, EventArgs e)
+        {
+            ClearInputs();
+            _editingId = Convert.ToInt64(((View)sender).ContentDescription);
+
+            var row = AppUtil.Connection.Get<FuelFill>(_editingId);
+
+            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
+            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
+            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
+            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
+
+            dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
+            odoValueInputText.Text = row.ODOValue.ToString("#");
+            fuelFilledText.Text = row.FuelFilled.ToString("#.00");
+            fuelCostText.Text = row.FuelCost.ToString("#.00");
+        }
+
+        private TableRow GetTableRow(params View[] views)
         {
             var tr = new TableRow(ApplicationContext)
             {
