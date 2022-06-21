@@ -58,6 +58,35 @@ namespace FuelMonitor.Activities
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
+        private void EditButton_Click(object sender, EventArgs e)
+        {
+            ClearInputs();
+            _editingId = Convert.ToInt64(((View)sender).ContentDescription);
+
+            var row = FuelFillDAO.Get(_editingId);
+
+            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
+            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
+            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
+            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
+
+            dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
+            odoValueInputText.Text = row.ODOValue.ToString("#");
+            fuelFilledText.Text = row.FuelFilled.ToString("#.00");
+            fuelCostText.Text = row.FuelCost.ToString("#.00");
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            var dataStored = SaveFuelEntry();
+
+            if (dataStored)
+            {
+                ClearInputs();
+                LoadEntries();
+            }
+        }
+
         private void ClearInputs()
         {
             _editingId = 0;
@@ -177,35 +206,6 @@ namespace FuelMonitor.Activities
 
             var ftr = GetColumnTextView($"Total Entries: {rows.Count}", TextAlignment.TextStart);
             layout.AddView(ftr);
-        }
-
-        private void EditButton_Click(object sender, EventArgs e)
-        {
-            ClearInputs();
-            _editingId = Convert.ToInt64(((View)sender).ContentDescription);
-
-            var row = FuelFillDAO.Get(_editingId);
-
-            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
-            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
-            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
-            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
-
-            dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
-            odoValueInputText.Text = row.ODOValue.ToString("#");
-            fuelFilledText.Text = row.FuelFilled.ToString("#.00");
-            fuelCostText.Text = row.FuelCost.ToString("#.00");
-        }
-
-        private void SaveButton_Click(object sender, EventArgs e)
-        {
-            var dataStored = SaveFuelEntry();
-
-            if (dataStored)
-            {
-                ClearInputs();
-                LoadEntries();
-            }
         }
 
         private TextView GetColumnTextView(string text, TextAlignment textAlignment = TextAlignment.TextStart)
