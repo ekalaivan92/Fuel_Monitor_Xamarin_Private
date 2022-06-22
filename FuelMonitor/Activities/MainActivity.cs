@@ -10,6 +10,8 @@ using FuelMonitor.BO.DAO;
 using FuelMonitor.BO.Models;
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace FuelMonitor.Activities
 {
@@ -29,6 +31,9 @@ namespace FuelMonitor.Activities
 
             var button = FindViewById(Resource.Id.saveButton);
             button.Click += SaveButton_Click;
+
+            var imageCaptureButton = FindViewById(Resource.Id.imageCaptureButton);
+            imageCaptureButton.Click += CaptureImageButton_Click;
 
             ClearInputs();
             LoadEntries();
@@ -86,6 +91,12 @@ namespace FuelMonitor.Activities
                 LoadEntries();
             }
         }
+
+        private void CaptureImageButton_Click(object sender, EventArgs e)
+        {
+            TakePhoto();
+        }
+
 
         private void ClearInputs()
         {
@@ -252,6 +263,46 @@ namespace FuelMonitor.Activities
             }
 
             return tr;
+        }
+
+        private bool TakePhoto()
+        {
+            var message = "";
+            try
+            {
+
+                var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
+                var options = new Xamarin.Essentials.MediaPickerOptions();
+                options.Title = "Capture Fule Bill & ODO Meter";
+
+                var photo = Xamarin.Essentials.MediaPicker.CapturePhotoAsync().Result;
+
+                using (var stream = photo.OpenReadAsync().Result)
+                {
+                    var image = BitmapFactory.DecodeStreamAsync(stream).Result;
+                    imageView.SetImageBitmap(image);
+                }
+
+                return true;
+            }
+            catch (FeatureNotSupportedException fnsEx)
+            {
+                message = "Feature is not supported on the device";
+            }
+            catch (PermissionException pEx)
+            {
+                message = "Permissions not granted";
+            }
+            catch (Exception ex)
+            {
+                message = $"CapturePhotoAsync THREW: {ex.Message}";
+            }
+            finally
+            {
+                Console.WriteLine(message);
+            }
+
+            return false;
         }
     }
 }
