@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
@@ -10,6 +11,7 @@ using FuelMonitor.BO.DAO;
 using FuelMonitor.BO.Models;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -92,11 +94,48 @@ namespace FuelMonitor.Activities
             }
         }
 
-        private void CaptureImageButton_Click(object sender, EventArgs e)
+        private async void CaptureImageButton_Click(object sender, EventArgs e)
         {
-            TakePhoto();
+            await TakePhoto();
         }
 
+        private bool TryGetImage(ImageView imageView, out byte[] bitmapData)
+        {
+            bitmapData = null;
+
+            try
+            {
+                var bitmapDrawable = ((BitmapDrawable)imageView.Drawable);
+                Bitmap bitmap;
+                if (bitmapDrawable == null)
+                {
+                    imageView.BuildDrawingCache();
+                    bitmap = imageView.GetDrawingCache(false);
+                    imageView.DestroyDrawingCache();
+                }
+                else
+                {
+                    bitmap = bitmapDrawable.Bitmap;
+                }
+
+                if (bitmap.AllocationByteCount == 0)
+                {
+                    return false;
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    bitmap.Compress(Bitmap.CompressFormat.Png, 0, stream);
+                    bitmapData = stream.ToArray();
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         private void ClearInputs()
         {
@@ -105,10 +144,13 @@ namespace FuelMonitor.Activities
             var odoValueInput = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
             var fuelFilled = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
             var fuelCost = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
+            var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
+
             dateInput.Text = DateTime.Now.ToString("dd-MM-yyyy HH:mm");
             odoValueInput.Text = string.Empty;
             fuelFilled.Text = string.Empty;
             fuelCost.Text = string.Empty;
+            imageView.SetImageBitmap(null);
 
             odoValueInput.RequestFocus();
         }
@@ -119,13 +161,16 @@ namespace FuelMonitor.Activities
             var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
             var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
             var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
+            var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
 
             var dateValid = DateTime.TryParseExact(dateInputText.Text, "dd-MM-yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date);
             var odoValid = long.TryParse(odoValueInputText.Text, out long odoValue);
             var fuelFilledValid = decimal.TryParse(fuelFilledText.Text, out decimal fuelFilled);
             var fuelCostValid = decimal.TryParse(fuelCostText.Text, out decimal fuelCost);
+            var isValidPhoto = TryGetImage(imageView, out byte[] image); 
 
-            var isValid = dateValid && odoValid && fuelFilledValid && fuelCostValid;
+            var isValid = dateValid && 
+                ((odoValid && fuelFilledValid && fuelCostValid) || isValidPhoto);
 
             if (isValid)
             {
@@ -134,7 +179,8 @@ namespace FuelMonitor.Activities
                     Date = date,
                     ODOValue = odoValue,
                     FuelFilled = fuelFilled,
-                    FuelCost = fuelCost
+                    FuelCost = fuelCost,
+                    PhotoCapute = image
                 };
 
                 AppUtil.Connection.BeginTransaction();
@@ -265,31 +311,30 @@ namespace FuelMonitor.Activities
             return tr;
         }
 
-        private bool TakePhoto()
+        private async Task<bool> TakePhoto()
         {
             var message = "";
             try
             {
-
-                var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
                 var options = new Xamarin.Essentials.MediaPickerOptions();
                 options.Title = "Capture Fule Bill & ODO Meter";
 
-                var photo = Xamarin.Essentials.MediaPicker.CapturePhotoAsync().Result;
+                var photoResult = await MediaPicker.CapturePhotoAsync();
 
-                using (var stream = photo.OpenReadAsync().Result)
+                using (var stream = photoResult.OpenReadAsync().Result)
                 {
+                    var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
                     var image = BitmapFactory.DecodeStreamAsync(stream).Result;
                     imageView.SetImageBitmap(image);
                 }
 
                 return true;
             }
-            catch (FeatureNotSupportedException fnsEx)
+            catch (FeatureNotSupportedException)
             {
                 message = "Feature is not supported on the device";
             }
-            catch (PermissionException pEx)
+            catch (PermissionException)
             {
                 message = "Permissions not granted";
             }

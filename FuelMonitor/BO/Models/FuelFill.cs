@@ -13,5 +13,6 @@ namespace FuelMonitor.BO.Models
         public long ODOValue { get; set; }
         public decimal FuelFilled { get; set; }
         public decimal FuelCost { get; set; }
+        public byte[] PhotoCapute { get; set; }
     }
 }
