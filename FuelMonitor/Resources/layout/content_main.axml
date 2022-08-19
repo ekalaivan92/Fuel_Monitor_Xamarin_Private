@@ -34,7 +34,7 @@
                     android:padding="5px"
                     android:src="@android:drawable/ic_menu_camera"
                     android:layout_gravity="center"
-                    android:scaleType="fitCenter" />
+                    android:scaleType="fitCenter"/>
 
                 <ImageButton
                     android:layout_width="wrap_content"
@@ -52,7 +52,9 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="200px"
+                android:layout_height="400px"
+                Aspect="AspectFill" 
+                android:scaleType="fitXY"
                 android:id="@+id/fillingImageView"
                 android:src="@drawable/abc_ab_share_pack_mtrl_alpha"/>
         </AbsoluteLayout>
@@ -117,14 +119,26 @@
                 android:hint="Cost *"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/saveButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:textStyle="bold"
-            android:layout_below="@id/fuelCostTextInput"
-            android:onClick="SaveButton_OnClick"/>
+            android:id="@+id/row3"
+            android:layout_below="@id/row2">
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save"
+                android:textStyle="bold"/>
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"

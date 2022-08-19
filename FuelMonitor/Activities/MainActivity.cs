@@ -79,11 +79,13 @@ namespace FuelMonitor.Activities
             var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
             var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
             var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
+            var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
 
             dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
             odoValueInputText.Text = row.ODOValue.ToString("#");
             fuelFilledText.Text = row.FuelFilled.ToString("#.00");
             fuelCostText.Text = row.FuelCost.ToString("#.00");
+            SetImageViewWithByteArray(imageView, row.PhotoCapute);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
@@ -145,6 +147,15 @@ namespace FuelMonitor.Activities
             }
         }
 
+        public static void SetImageViewWithByteArray(ImageView view, byte[] data)
+        {
+            if (data != null && data.Length > 0)
+            {
+                var bitmap = BitmapFactory.DecodeByteArray(data, 0, data.Length);
+                view.SetImageBitmap(bitmap);
+            }
+        }
+
         private void ClearInputs()
         {
             _editingId = 0;
@@ -154,11 +165,13 @@ namespace FuelMonitor.Activities
             var fuelCost = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
             var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
 
+            var image = Resources.GetDrawable(Resource.Drawable.abc_ab_share_pack_mtrl_alpha, ApplicationContext.Theme);
+
             dateInput.Text = DateTime.Now.ToString("dd-MM-yyyy HH:mm");
             odoValueInput.Text = string.Empty;
             fuelFilled.Text = string.Empty;
             fuelCost.Text = string.Empty;
-            imageView.SetImageBitmap(null);
+            imageView.SetImageDrawable(image);
 
             odoValueInput.RequestFocus();
         }
