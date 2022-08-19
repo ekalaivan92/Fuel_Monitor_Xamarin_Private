@@ -34,6 +34,9 @@ namespace FuelMonitor.Activities
             var button = FindViewById(Resource.Id.saveButton);
             button.Click += SaveButton_Click;
 
+            var cancelButton = FindViewById(Resource.Id.cancelButton);
+            cancelButton.Click += CancelButton_Click;
+
             var imageCaptureButton = FindViewById(Resource.Id.imageCaptureButton);
             imageCaptureButton.Click += CaptureImageButton_Click;
 
@@ -92,6 +95,11 @@ namespace FuelMonitor.Activities
                 ClearInputs();
                 LoadEntries();
             }
+        }
+
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
+            ClearInputs();
         }
 
         private async void CaptureImageButton_Click(object sender, EventArgs e)
