@@ -14,7 +14,18 @@
         android:layout_height="wrap_content"
         android:id="@+id/lr"
         android:orientation="vertical">
-               
+
+        <TextView
+            android:text="Capture Fillings"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginTop="10px"
+            android:layout_marginBottom="10px"
+            android:id="@+id/pageHeadingTextView"/>
+
         <AbsoluteLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -58,18 +69,7 @@
                 android:id="@+id/fillingImageView"
                 android:src="@drawable/abc_ab_share_pack_mtrl_alpha"/>
         </AbsoluteLayout>
-
-
-        <TextView
-            android:text="Capture Fillings"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:layout_marginTop="20px"
-            android:id="@+id/pageHeadingTextView"/>
-
+       
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
