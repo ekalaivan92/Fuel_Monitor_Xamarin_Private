@@ -115,6 +115,8 @@ namespace FuelMonitor.Activities
             {
                 var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
                 imageView.SetImageBitmap(result.Result);
+
+                ShowCaptureSectionToolTip(ViewStates.Visible);
             }
             else
             {
@@ -130,6 +132,8 @@ namespace FuelMonitor.Activities
             {
                 var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
                 imageView.SetImageBitmap(result.Result);
+
+                ShowCaptureSectionToolTip(ViewStates.Visible);
             }
             else
             {
@@ -201,7 +205,7 @@ namespace FuelMonitor.Activities
             fuelFilled.Text = string.Empty;
             fuelCost.Text = string.Empty;
             imageView.SetImageDrawable(image);
-
+            ShowCaptureSectionToolTip(ViewStates.Gone);
             odoValueInput.RequestFocus();
         }
 
@@ -359,6 +363,12 @@ namespace FuelMonitor.Activities
             }
 
             return tr;
+        }
+
+        private void ShowCaptureSectionToolTip(ViewStates viewState)
+        {
+            ((TextView)FindViewById(Resource.Id.sectionToolTip)).Visibility = viewState;
+            
         }
     }
 }
