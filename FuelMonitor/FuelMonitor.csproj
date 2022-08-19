@@ -70,6 +70,7 @@
     <Compile Include="BO\Views\FuelFillView.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\MediaPickerUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages.config" />

@@ -9,6 +9,7 @@ using Android.Views;
 using Android.Widget;
 using FuelMonitor.BO.DAO;
 using FuelMonitor.BO.Models;
+using FuelMonitor.Utils;
 using System;
 using System.Globalization;
 using System.IO;
@@ -31,14 +32,17 @@ namespace FuelMonitor.Activities
             var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
-            var button = FindViewById(Resource.Id.saveButton);
-            button.Click += SaveButton_Click;
+            var saveButton = FindViewById(Resource.Id.saveButton);
+            saveButton.Click += SaveButton_Click;
 
             var cancelButton = FindViewById(Resource.Id.cancelButton);
             cancelButton.Click += CancelButton_Click;
 
             var imageCaptureButton = FindViewById(Resource.Id.imageCaptureButton);
             imageCaptureButton.Click += CaptureImageButton_Click;
+
+            var imageUploadButton = FindViewById(Resource.Id.imageUploadButton);
+            imageUploadButton.Click += UploadImageButton_Click;
 
             ClearInputs();
             LoadEntries();
@@ -106,7 +110,32 @@ namespace FuelMonitor.Activities
 
         private async void CaptureImageButton_Click(object sender, EventArgs e)
         {
-            await TakePhoto();
+            var result = await MediaPickerUtils.CaptureImageWithCamera<Bitmap>("");
+            if (result.Success)
+            {
+                var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
+                imageView.SetImageBitmap(result.Result);
+            }
+            else
+            {
+                var toast = Toast.MakeText(ApplicationContext, result.ErrorMessage, ToastLength.Long);
+                toast.Show();
+            }
+        }
+
+        private async void UploadImageButton_Click(object sender, EventArgs e)
+        {
+            var result = await MediaPickerUtils.PickImageFromFile<Bitmap>("");
+            if (result.Success)
+            {
+                var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
+                imageView.SetImageBitmap(result.Result);
+            }
+            else
+            {
+                var toast = Toast.MakeText(ApplicationContext, result.ErrorMessage, ToastLength.Long);
+                toast.Show();
+            }            
         }
 
         private bool TryGetImage(ImageView imageView, out byte[] bitmapData)
@@ -188,9 +217,9 @@ namespace FuelMonitor.Activities
             var odoValid = long.TryParse(odoValueInputText.Text, out long odoValue);
             var fuelFilledValid = decimal.TryParse(fuelFilledText.Text, out decimal fuelFilled);
             var fuelCostValid = decimal.TryParse(fuelCostText.Text, out decimal fuelCost);
-            var isValidPhoto = TryGetImage(imageView, out byte[] image); 
+            var isValidPhoto = TryGetImage(imageView, out byte[] image);
 
-            var isValid = dateValid && 
+            var isValid = dateValid &&
                 ((odoValid && fuelFilledValid && fuelCostValid) || isValidPhoto);
 
             if (isValid)
@@ -330,45 +359,6 @@ namespace FuelMonitor.Activities
             }
 
             return tr;
-        }
-
-        private async Task<bool> TakePhoto()
-        {
-            var message = "";
-            try
-            {
-                var options = new Xamarin.Essentials.MediaPickerOptions();
-                options.Title = "Capture Fule Bill & ODO Meter";
-
-                var photoResult = await MediaPicker.CapturePhotoAsync();
-
-                using (var stream = photoResult.OpenReadAsync().Result)
-                {
-                    var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
-                    var image = BitmapFactory.DecodeStreamAsync(stream).Result;
-                    imageView.SetImageBitmap(image);
-                }
-
-                return true;
-            }
-            catch (FeatureNotSupportedException)
-            {
-                message = "Feature is not supported on the device";
-            }
-            catch (PermissionException)
-            {
-                message = "Permissions not granted";
-            }
-            catch (Exception ex)
-            {
-                message = $"CapturePhotoAsync THREW: {ex.Message}";
-            }
-            finally
-            {
-                Console.WriteLine(message);
-            }
-
-            return false;
         }
     }
 }
