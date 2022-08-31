@@ -1,5 +1,6 @@
 ﻿using FuelMonitor.BO.Models;
 using FuelMonitor.BO.Views;
+using FuelMonitor.Utils;
 using System.Collections.Generic;
 
 namespace FuelMonitor.BO.DAO

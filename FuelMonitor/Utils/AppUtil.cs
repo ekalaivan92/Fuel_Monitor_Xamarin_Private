@@ -3,7 +3,7 @@ using SQLite;
 using System;
 using System.IO;
 
-namespace FuelMonitor
+namespace FuelMonitor.Utils
 {
     public static class AppUtil
     {

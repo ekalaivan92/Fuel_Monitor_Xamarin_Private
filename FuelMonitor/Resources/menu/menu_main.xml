@@ -1,9 +1,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+  <group
+    android:id="@+id/menu_actions">
+    <item
+        android:id="@+id/action_estimate"
+        android:orderInCategory="100"
+        android:title="@string/action_estimate"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_overview"
+        android:orderInCategory="100"
+        android:title="@string/action_overview"
+        app:showAsAction="never" />
+  </group>
+
+  <group
+    android:id="@+id/menu_options">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+  </group>
 </menu>

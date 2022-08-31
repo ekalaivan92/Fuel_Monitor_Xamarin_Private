@@ -19,7 +19,7 @@ using Xamarin.Essentials;
 namespace FuelMonitor.Activities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
-    public class MainActivity : AppCompatActivity
+    public partial class MainActivity : AppCompatActivity
     {
         private long _editingId;
 
@@ -44,25 +44,15 @@ namespace FuelMonitor.Activities
             var imageUploadButton = FindViewById(Resource.Id.imageUploadButton);
             imageUploadButton.Click += UploadImageButton_Click;
 
+            var navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
+
+            var drawerLayout = FindViewById<Android.Support.V4.Widget.DrawerLayout>(Resource.Id.drawer_Layout);
+            var drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, Resource.String.open_drawer, Resource.String.close_drawer);
+            drawerLayout.AddDrawerListener(drawerToggle);
+            drawerToggle.SyncState();
+
             ClearInputs();
             LoadEntries();
-        }
-
-        public override bool OnCreateOptionsMenu(IMenu menu)
-        {
-            MenuInflater.Inflate(Resource.Menu.menu_main, menu);
-            return true;
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            int id = item.ItemId;
-            if (id == Resource.Id.action_settings)
-            {
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -139,7 +129,7 @@ namespace FuelMonitor.Activities
             {
                 var toast = Toast.MakeText(ApplicationContext, result.ErrorMessage, ToastLength.Long);
                 toast.Show();
-            }            
+            }
         }
 
         private bool TryGetImage(ImageView imageView, out byte[] bitmapData)
@@ -368,7 +358,7 @@ namespace FuelMonitor.Activities
         private void ShowCaptureSectionToolTip(ViewStates viewState)
         {
             ((TextView)FindViewById(Resource.Id.sectionToolTip)).Visibility = viewState;
-            
+
         }
     }
 }

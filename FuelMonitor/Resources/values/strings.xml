@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Fuel Monitor</string>
     <string name="action_settings">Settings</string>
+    <string name="action_estimate">Estimate</string>
+    <string name="action_overview">Overview</string>
+  <string name="open_drawer">Open drawer</string>
+  <string name="close_drawer">Close drawer</string>
 </resources>
