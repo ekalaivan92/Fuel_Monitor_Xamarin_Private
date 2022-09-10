@@ -63,6 +63,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activities\MainActivity.Initializer.cs" />
     <Compile Include="Utils\AppUtil.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="BO\DAO\FuelFillDAO.cs" />

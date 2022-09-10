@@ -13,8 +13,7 @@ using FuelMonitor.Utils;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Threading.Tasks;
-using Xamarin.Essentials;
+using EssentialPlatform = Xamarin.Essentials.Platform;
 
 namespace FuelMonitor.Activities
 {
@@ -26,28 +25,13 @@ namespace FuelMonitor.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            SetContentView(Resource.Layout.activity_main);
 
-            var toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
-            SetSupportActionBar(toolbar);
+            Initialize(savedInstanceState);
 
-            var saveButton = FindViewById(Resource.Id.saveButton);
             saveButton.Click += SaveButton_Click;
-
-            var cancelButton = FindViewById(Resource.Id.cancelButton);
             cancelButton.Click += CancelButton_Click;
-
-            var imageCaptureButton = FindViewById(Resource.Id.imageCaptureButton);
             imageCaptureButton.Click += CaptureImageButton_Click;
-
-            var imageUploadButton = FindViewById(Resource.Id.imageUploadButton);
             imageUploadButton.Click += UploadImageButton_Click;
-
-            var navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
-
-            var drawerLayout = FindViewById<Android.Support.V4.Widget.DrawerLayout>(Resource.Id.drawer_Layout);
-            var drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, Resource.String.open_drawer, Resource.String.close_drawer);
             drawerLayout.AddDrawerListener(drawerToggle);
             drawerToggle.SyncState();
 
@@ -57,7 +41,7 @@ namespace FuelMonitor.Activities
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            EssentialPlatform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -65,20 +49,16 @@ namespace FuelMonitor.Activities
         private void EditButton_Click(object sender, EventArgs e)
         {
             ClearInputs();
+
             _editingId = Convert.ToInt64(((View)sender).ContentDescription);
 
             var row = FuelFillDAO.Get(_editingId);
-
-            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
-            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
-            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
-            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
-            var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
 
             dateInputText.Text = row.Date.ToString("dd-MM-yyyy HH:mm");
             odoValueInputText.Text = row.ODOValue.ToString("#");
             fuelFilledText.Text = row.FuelFilled.ToString("#.00");
             fuelCostText.Text = row.FuelCost.ToString("#.00");
+
             SetImageViewWithByteArray(imageView, row.PhotoCapute);
         }
 
@@ -103,9 +83,7 @@ namespace FuelMonitor.Activities
             var result = await MediaPickerUtils.CaptureImageWithCamera<Bitmap>("");
             if (result.Success)
             {
-                var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
                 imageView.SetImageBitmap(result.Result);
-
                 ShowCaptureSectionToolTip(ViewStates.Visible);
             }
             else
@@ -120,9 +98,7 @@ namespace FuelMonitor.Activities
             var result = await MediaPickerUtils.PickImageFromFile<Bitmap>("");
             if (result.Success)
             {
-                var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
                 imageView.SetImageBitmap(result.Result);
-
                 ShowCaptureSectionToolTip(ViewStates.Visible);
             }
             else
@@ -182,31 +158,22 @@ namespace FuelMonitor.Activities
         private void ClearInputs()
         {
             _editingId = 0;
-            var dateInput = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
-            var odoValueInput = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
-            var fuelFilled = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
-            var fuelCost = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
-            var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
 
             var image = Resources.GetDrawable(Resource.Drawable.abc_ab_share_pack_mtrl_alpha, ApplicationContext.Theme);
 
-            dateInput.Text = DateTime.Now.ToString("dd-MM-yyyy HH:mm");
-            odoValueInput.Text = string.Empty;
-            fuelFilled.Text = string.Empty;
-            fuelCost.Text = string.Empty;
+            dateInputText.Text = DateTime.Now.ToString("dd-MM-yyyy HH:mm");
+            odoValueInputText.Text = string.Empty;
+            fuelFilledText.Text = string.Empty;
+            fuelCostText.Text = string.Empty;
             imageView.SetImageDrawable(image);
+
             ShowCaptureSectionToolTip(ViewStates.Gone);
-            odoValueInput.RequestFocus();
+
+            odoValueInputText.RequestFocus();
         }
 
         private bool SaveFuelEntry()
         {
-            var dateInputText = FindViewById<TextInputEditText>(Resource.Id.dateTextInput);
-            var odoValueInputText = FindViewById<TextInputEditText>(Resource.Id.odoValueTextInput);
-            var fuelFilledText = FindViewById<TextInputEditText>(Resource.Id.currentFilledFuleTextInput);
-            var fuelCostText = FindViewById<TextInputEditText>(Resource.Id.fuelCostTextInput);
-            var imageView = (ImageView)FindViewById(Resource.Id.fillingImageView);
-
             var dateValid = DateTime.TryParseExact(dateInputText.Text, "dd-MM-yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date);
             var odoValid = long.TryParse(odoValueInputText.Text, out long odoValue);
             var fuelFilledValid = decimal.TryParse(fuelFilledText.Text, out decimal fuelFilled);
@@ -275,9 +242,8 @@ namespace FuelMonitor.Activities
         {
             var rows = FuelFillDAO.GetAllView();
 
-            var layout = FindViewById<TableLayout>(Resource.Id.entriesListTable);
-            layout.RemoveAllViews();
-            layout.SetBackgroundColor(Color.WhiteSmoke);
+            entriesListTableLayout.RemoveAllViews();
+            entriesListTableLayout.SetBackgroundColor(Color.WhiteSmoke);
 
             var headerDateTextView = GetColumnTextView("Date", TextAlignment.Center);
             var headerFuelFilledTextView = GetColumnTextView("Fuel (l)", TextAlignment.Center);
@@ -288,7 +254,7 @@ namespace FuelMonitor.Activities
             var editButtonCol = GetColumnTextView("Edit", TextAlignment.TextStart);
 
             var th = GetTableRow(editButtonCol, headerDateTextView, headerFuelFilledTextView, headerFuelCostTextView, headerODOTextView, distanceTraveledTextView, avgTraveledTextView);
-            layout.AddView(th);
+            entriesListTableLayout.AddView(th);
 
             foreach (var row in rows)
             {
@@ -302,11 +268,11 @@ namespace FuelMonitor.Activities
 
                 var tr = GetTableRow(editButton, dateTextView, fuelFilledTextView, fuelCostTextView, odoTextView, distanceTextView, avgTextView);
 
-                layout.AddView(tr);
+                entriesListTableLayout.AddView(tr);
             }
 
             var ftr = GetColumnTextView($"Total Entries: {rows.Count}", TextAlignment.TextStart);
-            layout.AddView(ftr);
+            entriesListTableLayout.AddView(ftr);
         }
 
         private TextView GetColumnTextView(string text, TextAlignment textAlignment = TextAlignment.TextStart)
