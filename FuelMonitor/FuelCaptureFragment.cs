@@ -99,7 +99,7 @@ namespace FuelMonitor
             if (dataStored)
             {
                 ClearInputs();
-                //LoadEntries();
+                LoadEntries();
             }
         }
 
