@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Fuel Monitor</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_estimate">Estimate</string>
-    <string name="action_overview">Overview</string>
+  <string name="app_name">Fuel Monitor</string>
+  <string name="action_fuel_Capture">Capture</string>
+  <string name="action_settings">Settings</string>
+  <string name="action_estimate">Estimate</string>
+  <string name="action_overview">Overview</string>
   <string name="open_drawer">Open drawer</string>
   <string name="close_drawer">Close drawer</string>
   <string name="fule_capture_activity_caption">Capture Fillings</string>
