@@ -6,6 +6,7 @@ using Android.Support.V4.View;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using FuelMonitor.Fragments;
 using static Android.Support.Design.Widget.NavigationView;
 using EssentialPlatform = Xamarin.Essentials.Platform;
 
@@ -27,6 +28,8 @@ namespace FuelMonitor.Activities
 
             _navView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navView.SetNavigationItemSelectedListener(this);
+
+            SwitchFragment(Resource.Id.action_fuel_Capture);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -38,13 +41,21 @@ namespace FuelMonitor.Activities
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
-            Fragment newFragment = null;
-            var fragment = FragmentManager.FindFragmentById<Fragment>(Resource.Id.fuelCaptureFragment);
+            return SwitchFragment(menuItem.ItemId);
+        }
 
-            switch (menuItem.ItemId)
+        private bool SwitchFragment(int menuItemItemId)
+        {
+            Fragment newFragment = null;
+
+            switch (menuItemItemId)
             {
                 case Resource.Id.action_fuel_Capture:
                     newFragment = new FuelCaptureFragment();
+                    break;
+
+                case Resource.Id.action_estimate:
+                    newFragment = new EstimationFragment();
                     break;
 
                 default:
@@ -54,8 +65,7 @@ namespace FuelMonitor.Activities
             }
 
             var fragmentTransaction = FragmentManager.BeginTransaction();
-            fragmentTransaction.Detach(fragment);
-            fragmentTransaction.Attach(newFragment);
+            fragmentTransaction.Replace(Resource.Id.lr, newFragment);
             fragmentTransaction.Commit();
 
             drawerLayout.CloseDrawer(GravityCompat.Start);

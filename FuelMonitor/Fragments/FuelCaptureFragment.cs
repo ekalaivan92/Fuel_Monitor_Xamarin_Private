@@ -12,7 +12,7 @@ using System;
 using System.Globalization;
 using System.IO;
 
-namespace FuelMonitor
+namespace FuelMonitor.Fragments
 {
     public class FuelCaptureFragment : Fragment
     {

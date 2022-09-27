@@ -68,7 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\MainActivity.Initializer.cs" />
-    <Compile Include="FuelCaptureFragment.cs" />
+    <Compile Include="Fragments\EstimationFragment.cs" />
+    <Compile Include="Fragments\FuelCaptureFragment.cs" />
     <Compile Include="Utils\AppUtil.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="BO\DAO\FuelFillDAO.cs" />
@@ -129,6 +130,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\FuelCaptureFragment.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\EstimationFragment.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
