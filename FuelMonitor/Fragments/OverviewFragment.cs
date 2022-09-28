@@ -23,6 +23,8 @@ namespace FuelMonitor.Fragments
 
             chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
 
+            var color = SkiaSharp.SKColor.Parse("#03a9f4");
+
             var entries = FuelFillDAO
                 .GetAllView()
                 .Where(x => x.AVGKMPL > 0)
@@ -31,10 +33,10 @@ namespace FuelMonitor.Fragments
                     new ChartEntry((float)x.AVGKMPL)
                     {
                         Label = x.Date.ToString("MMMyy"),
-                        ValueLabel = x.ODOValue.ToString(),
-                        Color = SkiaSharp.SKColor.Parse("#2c3e50"),
-                        TextColor = SkiaSharp.SKColor.Parse("#2c3e50"),
-                        ValueLabelColor = SkiaSharp.SKColor.Parse("#2c3e50")
+                        ValueLabel = x.AVGKMPL.ToString("#0 kmpl"),
+                        Color = color,
+                        TextColor = color,
+                        ValueLabelColor = color
                     });
 
             chartView.Chart = new LineChart
@@ -42,6 +44,7 @@ namespace FuelMonitor.Fragments
                 Entries = entries,
                 LabelOrientation = Orientation.Horizontal,
                 ValueLabelOrientation = Orientation.Horizontal,
+                LabelColor = color,
                 LineMode = LineMode.Spline,
                 PointMode = PointMode.Circle,
                 EnableYFadeOutGradient = true

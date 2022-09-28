@@ -8,4 +8,5 @@
   <string name="close_drawer">Close drawer</string>
   <string name="fuel_capture_activity_caption">Capture Fillings</string>
   <string name="estimation_activity_caption">Estimate Availability</string>
+  <string name="kmpl_overview_activity_caption">Average kmpl</string>
 </resources>
