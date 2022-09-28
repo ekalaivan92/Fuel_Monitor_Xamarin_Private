@@ -29,7 +29,7 @@ namespace FuelMonitor.Activities
             _navView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navView.SetNavigationItemSelectedListener(this);
 
-            SwitchFragment(Resource.Id.action_fuel_Capture);
+            SwitchFragment(Resource.Id.action_overview);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -56,6 +56,10 @@ namespace FuelMonitor.Activities
 
                 case Resource.Id.action_estimate:
                     newFragment = new EstimationFragment();
+                    break;
+
+                case Resource.Id.action_overview:
+                    newFragment = new OverviewFragment();
                     break;
 
                 default:

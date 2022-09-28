@@ -70,6 +70,7 @@
     <Compile Include="Activities\MainActivity.Initializer.cs" />
     <Compile Include="Fragments\EstimationFragment.cs" />
     <Compile Include="Fragments\FuelCaptureFragment.cs" />
+    <Compile Include="Fragments\OverviewFragment.cs" />
     <Compile Include="Utils\AppUtil.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="BO\DAO\FuelFillDAO.cs" />
@@ -117,6 +118,9 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microcharts">
+      <Version>0.9.5.9</Version>
+    </PackageReference>
     <PackageReference Include="sqlite-net-pcl">
       <Version>1.8.116</Version>
     </PackageReference>
@@ -135,6 +139,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\EstimationFragment.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\OverviewFragment.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
