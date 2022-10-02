@@ -62,6 +62,10 @@ namespace FuelMonitor.Activities
                     newFragment = new OverviewFragment();
                     break;
 
+                case Resource.Id.action_settings:
+                    newFragment = new SettingsFragment();
+                    break;
+
                 default:
                     var toast = Toast.MakeText(ApplicationContext, "Invalid Option", ToastLength.Long);
                     toast.Show();

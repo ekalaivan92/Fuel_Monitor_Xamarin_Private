@@ -70,6 +70,7 @@
     <Compile Include="Activities\MainActivity.Initializer.cs" />
     <Compile Include="Fragments\EstimationFragment.cs" />
     <Compile Include="Fragments\FuelCaptureFragment.cs" />
+    <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Fragments\OverviewFragment.cs" />
     <Compile Include="Utils\AppUtil.cs" />
     <Compile Include="Activities\MainActivity.cs" />
@@ -144,6 +145,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\OverviewFragment.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\SettingsFragment.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

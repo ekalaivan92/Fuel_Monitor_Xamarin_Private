@@ -10,4 +10,5 @@
   <string name="estimation_activity_caption">Estimate Availability</string>
   <string name="kmpl_overview_activity_caption">Average KMPL</string>
   <string name="price_overview_activity_caption">Price Analysis</string>
+  <string name="settings_activity_caption">Settings</string>
 </resources>
