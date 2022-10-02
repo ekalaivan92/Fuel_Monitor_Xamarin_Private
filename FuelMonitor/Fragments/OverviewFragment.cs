@@ -2,15 +2,20 @@
 using Android.OS;
 using Android.Views;
 using FuelMonitor.BO.DAO;
+using FuelMonitor.BO.Views;
 using Microcharts;
 using Microcharts.Droid;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using AndroidWidget = Android.Widget;
 
 namespace FuelMonitor.Fragments
 {
     public class OverviewFragment : Fragment
     {
-        private ChartView chartView;
+        private ChartView kmlplChartView;
+        private ChartView priceChartView;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -21,13 +26,37 @@ namespace FuelMonitor.Fragments
         {
             var view = inflater.Inflate(Resource.Layout.OverviewFragment, container, false);
 
-            chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
+            kmlplChartView = view.FindViewById<ChartView>(Resource.Id.kmplChartView);
+            priceChartView = view.FindViewById<ChartView>(Resource.Id.priceChartView);
+            var fuelEntries = FuelFillDAO.GetAllView();
 
-            var lineColor = SkiaSharp.SKColor.Parse("#03a9f4");
+            var validEntriesCount = fuelEntries
+                .Where(x => x.AVGKMPL > 0 && x.LastFillDate.HasValue)
+                .Count();
+            if (validEntriesCount > 0)
+            {
+                ShowCharts(fuelEntries);
+            }
+            else
+            {
+                var toast = AndroidWidget.Toast.MakeText(
+                    Context,
+                    "No valid entries for graphical analyze",
+                    AndroidWidget.ToastLength.Long);
+
+                toast.Show();
+            }
+
+            return view;
+        }
+
+        private void ShowCharts(IEnumerable<FuelFillView> fuelEntries)
+        {
+            var lineColor = SkiaSharp.SKColor.Parse("#3f51b5");
             var labelColor = SkiaSharp.SKColor.Parse("#607D8B");
+            var barColor = SkiaSharp.SKColor.Parse("#a0e2ff");
 
-            var entries = FuelFillDAO
-                .GetAllView()
+            var entries = fuelEntries
                 .Where(x => x.AVGKMPL > 0)
                 .OrderBy(X => X.Date)
                 .Select(x =>
@@ -40,7 +69,7 @@ namespace FuelMonitor.Fragments
                         ValueLabelColor = labelColor
                     });
 
-            chartView.Chart = new LineChart
+            kmlplChartView.Chart = new LineChart
             {
                 Entries = entries,
                 LabelOrientation = Orientation.Horizontal,
@@ -51,7 +80,37 @@ namespace FuelMonitor.Fragments
                 EnableYFadeOutGradient = true
             };
 
-            return view;
+            entries = fuelEntries
+                .Where(x => x.LastFillDate.HasValue)
+                .OrderBy(X => X.Date)
+                .Select(x =>
+                {
+                    var runningDays = (x.Date - x.LastFillDate)?.Days ?? 0;
+                    var pricePerDay = 0m;
+
+                    if (x.FuelCost.HasValue && runningDays > 0)
+                    {
+                        pricePerDay = Math.Round(x.FuelCost.Value / runningDays, 2);
+                    }
+
+                    return new ChartEntry((float)pricePerDay)
+                    {
+                        Label = x.Date.ToString("MMMyy"),
+                        ValueLabel = $"Rs.{pricePerDay} / Day",
+                        Color = barColor,
+                        TextColor = labelColor,
+                        ValueLabelColor = labelColor
+                    };
+                });
+
+            priceChartView.Chart = new BarChart
+            {
+                Entries = entries,
+                LabelOrientation = Orientation.Horizontal,
+                ValueLabelOrientation = Orientation.Horizontal,
+                LabelColor = labelColor,
+                PointMode = PointMode.Circle
+            };
         }
     }
 }

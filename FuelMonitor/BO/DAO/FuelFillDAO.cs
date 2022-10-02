@@ -37,7 +37,8 @@ namespace FuelMonitor.BO.DAO
                 from
                     (select
                         *,
-                        (lag(ODOValue, 1) over (order by date, _id)) as lastodovalue
+                        (lag(ODOValue, 1) over (order by date, _id)) as lastodovalue,
+                        (lag(date, 1) over (order by date, _id)) as lastfilldate
                     from fuelfills
                     order by date desc, _id desc)x";
 
